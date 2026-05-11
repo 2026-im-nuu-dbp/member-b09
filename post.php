@@ -1,34 +1,30 @@
 <?php
-// Insert new discussion into database
-
-header('Content-Type: text/html; charset=utf-8');
-require 'db_config.php';
+// post.php
+// 新增討論貼文。作者不再由表單輸入，而是直接使用登入者 user_id。
+require_once __DIR__ . '/functions.php';
+start_session_once();
+require_login();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    die('Invalid request method.');
+    redirect('index.php');
 }
 
-$author = isset($_POST['author']) ? trim($_POST['author']) : '';
-$title = isset($_POST['title']) ? trim($_POST['title']) : '';
-$content = isset($_POST['content']) ? trim($_POST['content']) : '';
+verify_csrf();
 
-// Validation
-if (empty($author) || empty($title) || empty($content)) {
-    die('所有欄位都必須填寫。<br><a href="index.php">返回</a>');
+$title = trim($_POST['title'] ?? '');
+$content = trim($_POST['content'] ?? '');
+$userId = current_user_id();
+
+if ($title === '' || $content === '') {
+    flash_set('error', '標題與內容不可空白。');
+    redirect('index.php');
 }
 
-// Limit input length
-$author = substr($author, 0, 100);
-$title = substr($title, 0, 200);
-$content = substr($content, 0, 10000);
+$title = mb_substr($title, 0, 200);
+$content = mb_substr($content, 0, MAX_POST_LENGTH);
 
-try {
-    $stmt = $pdo->prepare('INSERT INTO news (title, content, author) VALUES (?, ?, ?)');
-    $stmt->execute([$title, $content, $author]);
+$stmt = $pdo->prepare('INSERT INTO news (title, content, user_id) VALUES (?, ?, ?)');
+$stmt->execute([$title, $content, $userId]);
 
-    // Redirect to homepage
-    header('Location: index.php');
-    exit;
-} catch (PDOException $e) {
-    die('發表討論失敗: ' . $e->getMessage() . '<br><a href="index.php">返回</a>');
-}
+flash_set('success', '貼文已發布。');
+redirect('index.php');

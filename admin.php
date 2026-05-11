@@ -1,6 +1,7 @@
 <?php
 // admin.php
-// 管理員介面：新增、修改、刪除會員資料。
+// 管理員介面：新增、修改、刪除會員資料，也可查看信箱驗證狀態。
+
 require_once __DIR__ . '/functions.php';
 start_session_once();
 require_admin($pdo);
@@ -9,12 +10,12 @@ $user = current_user($pdo);
 $editId = isset($_GET['edit']) ? (int)$_GET['edit'] : 0;
 $editUser = null;
 if ($editId > 0) {
-    $stmt = $pdo->prepare('SELECT id, username, email, nickname, favorite_color, avatar, role, status FROM users WHERE id = ? LIMIT 1');
+    $stmt = $pdo->prepare('SELECT id, username, email, nickname, favorite_color, avatar, role, status, email_verified_at FROM users WHERE id = ? LIMIT 1');
     $stmt->execute([$editId]);
     $editUser = $stmt->fetch();
 }
 
-$users = $pdo->query('SELECT id, username, email, nickname, favorite_color, avatar, role, status, created_at FROM users ORDER BY id ASC')->fetchAll();
+$users = $pdo->query('SELECT id, username, email, nickname, favorite_color, avatar, role, status, email_verified_at, created_at FROM users ORDER BY id ASC')->fetchAll();
 page_header('管理員', $user);
 ?>
 <section class="admin-wrap">
@@ -47,9 +48,11 @@ page_header('管理員', $user);
                 </label>
                 <label>狀態
                     <select name="status">
-                        <option value="active" <?= ($editUser['status'] ?? 'active') === 'active' ? 'selected' : '' ?>>active</option>
-                        <option value="locked" <?= ($editUser['status'] ?? '') === 'locked' ? 'selected' : '' ?>>locked</option>
+                        <option value="pending" <?= ($editUser['status'] ?? 'active') === 'pending' ? 'selected' : '' ?>>pending：待驗證</option>
+                        <option value="active" <?= ($editUser['status'] ?? 'active') === 'active' ? 'selected' : '' ?>>active：已驗證</option>
+                        <option value="locked" <?= ($editUser['status'] ?? '') === 'locked' ? 'selected' : '' ?>>locked：停用</option>
                     </select>
+                    <small>改成 active 會視為管理員手動驗證。</small>
                 </label>
                 <label>喜歡顏色
                     <select name="favorite_color">
@@ -79,7 +82,7 @@ page_header('管理員', $user);
             <table>
                 <thead>
                     <tr>
-                        <th>ID</th><th>玩家</th><th>帳號</th><th>Email</th><th>角色</th><th>狀態</th><th>建立時間</th><th>操作</th>
+                        <th>ID</th><th>玩家</th><th>帳號</th><th>Email</th><th>角色</th><th>狀態</th><th>驗證時間</th><th>建立時間</th><th>操作</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -91,6 +94,7 @@ page_header('管理員', $user);
                         <td><?= h($member['email']) ?></td>
                         <td><span class="badge"><?= h($member['role']) ?></span></td>
                         <td><span class="badge <?= h($member['status']) ?>"><?= h($member['status']) ?></span></td>
+                        <td><?= h($member['email_verified_at'] ?: '-') ?></td>
                         <td><?= h($member['created_at']) ?></td>
                         <td class="actions">
                             <a href="admin.php?edit=<?= (int)$member['id'] ?>">修改</a>

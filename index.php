@@ -179,14 +179,14 @@ page_header('論壇', $user);
                 <div class="quest-main">
                     <button type="button" class="quest-check" data-quest-toggle aria-label="切換 SMTP 任務狀態">✓</button>
                     <button type="button" class="quest-open" data-quest-open aria-expanded="false">
-                        <span class="quest-name">Gmail SMTP 寄信</span>
+                        <span class="quest-name">註冊驗證信</span>
                         <span class="quest-reward">+25 XP</span>
                     </button>
                     <span class="quest-badge" data-quest-badge>完成</span>
                 </div>
                 <div class="quest-detail" data-quest-detail hidden>
-                    <p>管理員可以透過 Gmail SMTP 發送系統通知，並保留寄信紀錄。</p>
-                    <a href="mailer_panel.php">打開寄信系統</a>
+                    <p>使用者註冊時會透過 Gmail SMTP 寄出驗證連結，點擊後帳號才會啟用。</p>
+                    <a href="mailer_panel.php">查看驗證信紀錄</a>
                 </div>
             </article>
 

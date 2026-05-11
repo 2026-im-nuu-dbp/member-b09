@@ -1,6 +1,6 @@
 <?php
 // functions.php
-// 放共用小工具：安全輸出、跳轉、登入檢查、CSRF、會員資料、Minecraft 主題資料。
+// 共用小工具：安全輸出、跳轉、登入檢查、CSRF、會員資料、驗證 token、Minecraft 主題資料。
 
 require_once __DIR__ . '/db.php';
 
@@ -55,31 +55,19 @@ function current_user_id(): ?int
 function current_user(PDO $pdo): ?array
 {
     $id = current_user_id();
-
     if (!$id) {
         return null;
     }
 
     $stmt = $pdo->prepare(
-        'SELECT 
-            id,
-            username,
-            nickname,
-            email,
-            favorite_color,
-            avatar,
-            role,
-            status,
-            favorite_playstyle,
-            favorite_biomes
+        'SELECT id, username, nickname, email, favorite_color, avatar, role, status,
+                email_verified_at, favorite_playstyle, favorite_biomes
          FROM users
          WHERE id = ?
          LIMIT 1'
     );
-
     $stmt->execute([$id]);
     $user = $stmt->fetch();
-
     return $user ?: null;
 }
 
@@ -117,6 +105,32 @@ function flash_get(string $type): string
     $message = $_SESSION['flash'][$type] ?? '';
     unset($_SESSION['flash'][$type]);
     return $message;
+}
+
+function base_url(string $path = ''): string
+{
+    return rtrim(BASE_URL, '/') . '/' . ltrim($path, '/');
+}
+
+function create_activation_token(PDO $pdo, int $userId): string
+{
+    $plainToken = bin2hex(random_bytes(32));
+    $tokenHash = hash('sha256', $plainToken);
+    $expiresAt = date('Y-m-d H:i:s', time() + TOKEN_EXPIRE_HOURS * 3600);
+    $ip = $_SERVER['REMOTE_ADDR'] ?? null;
+    $ua = substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 255);
+
+    // 同一個帳號只保留最新未使用的驗證連結，避免舊信件還能被拿來開通。
+    $stmt = $pdo->prepare('UPDATE verification_tokens SET used_at = NOW() WHERE user_id = ? AND used_at IS NULL');
+    $stmt->execute([$userId]);
+
+    $stmt = $pdo->prepare(
+        'INSERT INTO verification_tokens (user_id, token_hash, expires_at, requested_ip, requested_ua)
+         VALUES (?, ?, ?, ?, ?)'
+    );
+    $stmt->execute([$userId, $tokenHash, $expiresAt, $ip, $ua]);
+
+    return $plainToken;
 }
 
 function avatar_options(): array
@@ -188,10 +202,10 @@ function page_header(string $title, ?array $user = null): void
         <nav class="nav-links">
             <a class="<?= active_nav('index.php') ?>" href="index.php">論壇</a>
             <?php if ($user): ?>
-                <a class="<?= active_nav('mailer_panel.php') ?>" href="mailer_panel.php">寄信系統</a>
                 <a class="<?= active_nav('profile.php') ?>" href="profile.php">個人資料</a>
                 <?php if ($user['role'] === 'admin'): ?>
                     <a class="<?= active_nav('admin.php') ?>" href="admin.php">管理員</a>
+                    <a class="<?= active_nav('mailer_panel.php') ?>" href="mailer_panel.php">驗證信紀錄</a>
                 <?php endif; ?>
             <?php endif; ?>
         </nav>
@@ -215,39 +229,31 @@ function page_footer(): void
 {
     ?>
 </main>
-<footer class="footer">hw7 Demo · SMTP / Forum / Comment System</footer>
+<footer class="footer">hw7 Demo · Minecraft Forum · Email Verification</footer>
 </body>
 </html>
     <?php
 }
 
-function playstyle_options() {
+function playstyle_options(): array
+{
     return [
         'builder' => '建築師',
         'explorer' => '探險家',
         'redstoner' => '紅石工程師',
         'farmer' => '農夫',
-        'fighter' => '戰士'
+        'fighter' => '戰士',
     ];
 }
 
-function biome_options() {
+function biome_options(): array
+{
     return [
         'plains' => '平原',
         'desert' => '沙漠',
         'jungle' => '叢林',
         'ocean' => '海洋',
         'nether' => '地獄',
-        'end' => '終界'
-    ];
-}
-
-function options() {
-    return [
-        'steve' => '<img src="/assets/avatars/steve.png" alt="Steve">',
-        'alex' => '<img src="/assets/avatars/alex.png" alt="Alex">',
-        'creeper' => '<img src="/assets/avatars/creeper.png" alt="Creeper">',
-        'zombie' => '<img src="/assets/avatars/zombie.png" alt="Zombie">',
-        'enderman' => '<img src="/assets/avatars/enderman.png" alt="Enderman">'
+        'end' => '終界',
     ];
 }

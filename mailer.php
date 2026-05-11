@@ -1,7 +1,7 @@
 <?php
 // mailer.php
-// 不使用 Composer，也不依賴 PHPMailer，直接用 PHP socket 實作簡化版 SMTP。
-// 這樣交作業時只要 XAMPP / Apache / PHP 有 openssl，就能連 Gmail SMTP。
+// Gmail SMTP 寄信核心。這版只提供「註冊會員驗證信」，不提供一般通知寄信功能。
+// 不使用 Composer / PHPMailer，直接用 PHP socket 實作簡化版 SMTP。
 
 require_once __DIR__ . '/functions.php';
 
@@ -27,13 +27,13 @@ function text_to_html(string $text): string
     return nl2br(h($text));
 }
 
-function build_email_message(string $toEmail, string $toName, string $subject, string $textBody, ?array $attachment = null): array
+function build_email_message(string $toEmail, string $toName, string $subject, string $textBody): array
 {
     $from = safe_mailbox(MAIL_FROM_EMAIL, MAIL_FROM_NAME);
     $to = safe_mailbox($toEmail, $toName);
     $subjectEncoded = encode_mail_header($subject);
     $date = date('r');
-    $host = parse_url('http://localhost/hw7', PHP_URL_HOST) ?: 'localhost';
+    $host = parse_url(BASE_URL, PHP_URL_HOST) ?: 'localhost';
     $messageId = '<' . bin2hex(random_bytes(16)) . '@' . $host . '>';
 
     $headers = [];
@@ -48,63 +48,31 @@ function build_email_message(string $toEmail, string $toName, string $subject, s
     $htmlBody = "<!DOCTYPE html>\n<html lang=\"zh-TW\">\n<head>\n<meta charset=\"UTF-8\">\n<title>" . h($subject) . "</title>\n</head>\n";
     $htmlBody .= "<body style=\"font-family:Arial,'Noto Sans TC',sans-serif;background:#f3f6ed;padding:24px;color:#243018;\">";
     $htmlBody .= "<div style=\"max-width:720px;margin:auto;background:#ffffff;border:4px solid #5b7f34;border-radius:14px;box-shadow:0 8px 0 #2e471b;padding:24px;\">";
-    $htmlBody .= '<h2 style="margin-top:0;color:#2e5c1d">▣ ' . h(APP_NAME) . '</h2>';
+    $htmlBody .= '<h2 style="margin-top:0;color:#2e5c1d">▣ ' . h(APP_NAME) . ' 信箱驗證</h2>';
     $htmlBody .= '<div style="line-height:1.8;font-size:15px">' . text_to_html($textBody) . '</div>';
     $htmlBody .= '<hr style="border:none;border-top:1px solid #d9e8c6;margin:24px 0">';
-    $htmlBody .= '<p style="font-size:12px;color:#61724d">此信由 hw7 系統自動發送。若不是你操作，請忽略此信。</p>';
+    $htmlBody .= '<p style="font-size:12px;color:#61724d">此信由系統自動發送。若不是你操作，請忽略此信。</p>';
     $htmlBody .= '</div></body></html>';
 
-    if ($attachment === null) {
-        $altBoundary = 'ALT_' . bin2hex(random_bytes(12));
-        $headers[] = 'Content-Type: multipart/alternative; boundary="' . $altBoundary . '"';
+    $altBoundary = 'ALT_' . bin2hex(random_bytes(12));
+    $headers[] = 'Content-Type: multipart/alternative; boundary="' . $altBoundary . '"';
 
-        $body = '';
-        $body .= '--' . $altBoundary . "\r\n";
-        $body .= "Content-Type: text/plain; charset=UTF-8\r\n";
-        $body .= "Content-Transfer-Encoding: 8bit\r\n\r\n";
-        $body .= str_replace("\n", "\r\n", $textBody) . "\r\n";
-        $body .= '--' . $altBoundary . "\r\n";
-        $body .= "Content-Type: text/html; charset=UTF-8\r\n";
-        $body .= "Content-Transfer-Encoding: 8bit\r\n\r\n";
-        $body .= str_replace("\n", "\r\n", $htmlBody) . "\r\n";
-        $body .= '--' . $altBoundary . "--\r\n";
-    } else {
-        $mixedBoundary = 'MIXED_' . bin2hex(random_bytes(12));
-        $altBoundary = 'ALT_' . bin2hex(random_bytes(12));
-        $headers[] = 'Content-Type: multipart/mixed; boundary="' . $mixedBoundary . '"';
-
-        $body = '';
-        $body .= '--' . $mixedBoundary . "\r\n";
-        $body .= 'Content-Type: multipart/alternative; boundary="' . $altBoundary . "\"\r\n\r\n";
-        $body .= '--' . $altBoundary . "\r\n";
-        $body .= "Content-Type: text/plain; charset=UTF-8\r\n";
-        $body .= "Content-Transfer-Encoding: 8bit\r\n\r\n";
-        $body .= str_replace("\n", "\r\n", $textBody) . "\r\n";
-        $body .= '--' . $altBoundary . "\r\n";
-        $body .= "Content-Type: text/html; charset=UTF-8\r\n";
-        $body .= "Content-Transfer-Encoding: 8bit\r\n\r\n";
-        $body .= str_replace("\n", "\r\n", $htmlBody) . "\r\n";
-        $body .= '--' . $altBoundary . "--\r\n";
-
-        $fileData = chunk_split(base64_encode(file_get_contents($attachment['path'])));
-        $fileName = str_replace(['"', "\r", "\n"], '', $attachment['name']);
-        $mimeType = $attachment['mime'];
-
-        $body .= '--' . $mixedBoundary . "\r\n";
-        $body .= 'Content-Type: ' . $mimeType . '; name="' . $fileName . "\"\r\n";
-        $body .= "Content-Transfer-Encoding: base64\r\n";
-        $body .= 'Content-Disposition: attachment; filename="' . $fileName . "\"\r\n\r\n";
-        $body .= $fileData . "\r\n";
-        $body .= '--' . $mixedBoundary . "--\r\n";
-    }
+    $body = '';
+    $body .= '--' . $altBoundary . "\r\n";
+    $body .= "Content-Type: text/plain; charset=UTF-8\r\n";
+    $body .= "Content-Transfer-Encoding: 8bit\r\n\r\n";
+    $body .= str_replace("\n", "\r\n", $textBody) . "\r\n";
+    $body .= '--' . $altBoundary . "\r\n";
+    $body .= "Content-Type: text/html; charset=UTF-8\r\n";
+    $body .= "Content-Transfer-Encoding: 8bit\r\n\r\n";
+    $body .= str_replace("\n", "\r\n", $htmlBody) . "\r\n";
+    $body .= '--' . $altBoundary . "--\r\n";
 
     $raw = implode("\r\n", $headers) . "\r\n\r\n" . $body;
 
     return [
         'to_email' => $toEmail,
         'subject' => $subject,
-        'headers' => implode("\r\n", $headers),
-        'body' => $body,
         'raw' => $raw,
     ];
 }
@@ -217,10 +185,10 @@ class SimpleSmtpClient
     }
 }
 
-function send_system_mail(PDO $pdo, string $type, string $toEmail, string $toName, string $subject, string $textBody, ?array $attachment = null): bool
+function send_system_mail(PDO $pdo, string $type, string $toEmail, string $toName, string $subject, string $textBody): bool
 {
     $logId = create_email_log($pdo, $type, $toEmail, $toName, $subject, $textBody);
-    $mail = build_email_message($toEmail, $toName, $subject, $textBody, $attachment);
+    $mail = build_email_message($toEmail, $toName, $subject, $textBody);
     $savedPath = null;
 
     if (MAIL_ALWAYS_SAVE_COPY || MAIL_DRIVER === 'log') {
@@ -233,8 +201,8 @@ function send_system_mail(PDO $pdo, string $type, string $toEmail, string $toNam
             return true;
         }
 
-        if (SMTP_USERNAME === '' || str_contains(SMTP_USERNAME, 'your_') || str_contains(SMTP_PASSWORD, 'your_')) {
-            throw new RuntimeException('尚未設定 SMTP_USERNAME / SMTP_PASSWORD。請到 config.php 填入 Gmail 與應用程式密碼。');
+        if (SMTP_USERNAME === '' || str_contains(SMTP_USERNAME, 'your_') || SMTP_PASSWORD === '' || str_contains(SMTP_PASSWORD, 'your_')) {
+            throw new RuntimeException('尚未設定 Gmail SMTP。請到 config.php 填入 SMTP_USERNAME 與 SMTP_PASSWORD。');
         }
 
         $client = new SimpleSmtpClient();
@@ -245,4 +213,18 @@ function send_system_mail(PDO $pdo, string $type, string $toEmail, string $toNam
         update_email_log($pdo, $logId, 'failed', $e->getMessage(), $savedPath);
         return false;
     }
+}
+
+function send_activation_email(PDO $pdo, int $userId, string $nickname, string $email, string $plainToken): bool
+{
+    $activationLink = base_url('activate.php?token=' . urlencode($plainToken));
+    $subject = '【' . APP_NAME . '】請完成會員信箱驗證';
+    $body = "您好，{$nickname}：\n\n";
+    $body .= "你剛剛申請了 " . APP_NAME . " 的會員帳號。\n";
+    $body .= "請點擊下面的連結完成信箱驗證，驗證完成後才能登入論壇：\n\n";
+    $body .= $activationLink . "\n\n";
+    $body .= "這個連結將於 " . TOKEN_EXPIRE_HOURS . " 小時後失效，且只能使用一次。\n";
+    $body .= "如果這不是你本人操作，請忽略此信。\n";
+
+    return send_system_mail($pdo, 'activation', $email, $nickname, $subject, $body);
 }

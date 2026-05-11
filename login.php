@@ -15,7 +15,7 @@ page_header('登入');
 <section class="auth-wrap">
     <div class="pixel-card auth-card">
         <div class="card-title">▣ 玩家登入</div>
-        <p class="muted">登入後才能發文、留言，以及使用 SMTP 寄信系統。</p>
+        <p class="muted">登入前必須先完成 Email 驗證。登入後才能發文與留言。</p>
 
         <?php if ($error): ?><div class="alert error"><?= h($error) ?></div><?php endif; ?>
         <?php if ($success): ?><div class="alert success"><?= h($success) ?></div><?php endif; ?>

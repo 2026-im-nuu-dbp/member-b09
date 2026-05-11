@@ -1,7 +1,8 @@
 <?php
 // register_process.php
-// 處理註冊：檢查格式、雜湊密碼、寫入會員資料表。
-require_once __DIR__ . '/functions.php';
+// 處理註冊：建立 pending 會員、產生驗證 token、透過 Gmail SMTP 寄出驗證信。
+
+require_once __DIR__ . '/mailer.php';
 start_session_once();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -40,7 +41,31 @@ if ($stmt->fetch()) {
 }
 
 $passwordHash = password_hash($password, PASSWORD_DEFAULT);
-$stmt = $pdo->prepare('INSERT INTO users (username, email, password_hash, nickname, favorite_color, avatar, role, status) VALUES (?, ?, ?, ?, ?, ?, "user", "active")');
-$stmt->execute([$username, $email, $passwordHash, $nickname, $favoriteColor, $avatar]);
 
-redirect('login.php?success=' . urlencode('註冊成功，請登入。'));
+try {
+    $pdo->beginTransaction();
+
+    $stmt = $pdo->prepare(
+        'INSERT INTO users (username, email, password_hash, nickname, favorite_color, avatar, role, status, email_verified_at)
+         VALUES (?, ?, ?, ?, ?, ?, "user", "pending", NULL)'
+    );
+    $stmt->execute([$username, $email, $passwordHash, $nickname, $favoriteColor, $avatar]);
+    $userId = (int)$pdo->lastInsertId();
+
+    $plainToken = create_activation_token($pdo, $userId);
+
+    $pdo->commit();
+} catch (Throwable $e) {
+    if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+    redirect('register.php?error=' . urlencode('註冊失敗：' . $e->getMessage()));
+}
+
+$mailOk = send_activation_email($pdo, $userId, $nickname, $email, $plainToken);
+
+if ($mailOk) {
+    redirect('login.php?success=' . urlencode('註冊申請已送出，驗證信已寄到你的 Email。請先點擊信中的連結完成驗證。'));
+}
+
+redirect('login.php?error=' . urlencode('帳號已建立，但驗證信寄送失敗。請聯絡管理員或檢查 Gmail SMTP 設定。'));

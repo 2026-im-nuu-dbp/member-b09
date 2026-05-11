@@ -686,10 +686,8 @@ th {
 }
 
 .form-stack .btn {
-    justify-self: center;
-    width: min(260px, 100%);
-    min-width: 190px;
-    margin-top: 12px;
+    justify-self: end;
+    min-width: 150px;
 }
 
 @media (max-width: 720px) {
@@ -706,6 +704,260 @@ th {
         grid-template-columns: 1fr;
     }
 
+    .form-stack .btn {
+        justify-self: stretch;
+        width: 100%;
+    }
+}
+/* ===== 互動版系統任務板 ===== */
+.quest-board {
+    display: grid;
+    gap: 14px;
+}
+
+.quest-board .compact-title {
+    margin-bottom: 6px;
+    padding-bottom: 8px;
+}
+
+.quest-board-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.quest-level {
+    display: inline-grid;
+    place-items: center;
+    min-width: 56px;
+    height: 34px;
+    padding: 0 10px;
+    border: 3px solid #26361f;
+    border-radius: 10px;
+    background: #d9edbd;
+    box-shadow: 3px 3px 0 #1c2c15;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.quest-progress-wrap {
+    display: grid;
+    gap: 8px;
+}
+
+.quest-progress-text {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 900;
+}
+
+.quest-progress-track {
+    height: 18px;
+    border: 3px solid #26361f;
+    border-radius: 999px;
+    background: #fffef8;
+    overflow: hidden;
+    box-shadow: inset 2px 2px 0 rgba(0,0,0,.18);
+}
+
+.quest-progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #5f8f3a, #3fbdd9);
+    transition: width .25s ease;
+}
+
+.quest-filter {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.quest-filter-btn,
+.quest-reset,
+.quest-check,
+.quest-open {
+    font: inherit;
+}
+
+.quest-filter-btn,
+.quest-reset {
+    border: 2px solid #26361f;
+    border-radius: 9px;
+    background: #eef5df;
+    color: var(--ink);
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.quest-filter-btn {
+    padding: 7px 6px;
+    font-size: 13px;
+}
+
+.quest-filter-btn.active,
+.quest-filter-btn:hover {
+    background: #d9edbd;
+    box-shadow: 2px 2px 0 #1c2c15;
+}
+
+.quest-items {
+    display: grid;
+    gap: 10px;
+}
+
+.quest-item {
+    border: 3px solid #26361f;
+    border-radius: 12px;
+    background: #f0f7e5;
+    overflow: hidden;
+    box-shadow: 3px 3px 0 rgba(29, 42, 24, .55);
+}
+
+.quest-item.is-open {
+    background: #fffef8;
+}
+
+.quest-item.is-done {
+    border-color: var(--grass-dark);
+}
+
+.quest-main {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr) auto;
+    gap: 8px;
+    align-items: center;
+    padding: 10px;
+}
+
+.quest-check {
+    width: 32px;
+    height: 32px;
+    border: 3px solid #26361f;
+    border-radius: 9px;
+    background: #fffef8;
+    color: var(--danger);
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 2px 2px 0 #1c2c15;
+}
+
+.quest-item.is-done .quest-check {
+    background: #dff3c9;
+    color: var(--success);
+}
+
+.quest-open {
+    display: grid;
+    gap: 3px;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    text-align: left;
+    cursor: pointer;
+}
+
+.quest-open:hover .quest-name {
+    text-decoration: underline;
+}
+
+.quest-name {
+    font-weight: 900;
+    overflow-wrap: anywhere;
+}
+
+.quest-reward {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.quest-badge {
+    padding: 4px 7px;
+    border: 2px solid #26361f;
+    border-radius: 999px;
+    background: #ffd8d2;
+    color: #7f1f16;
+    font-size: 12px;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.quest-item.is-done .quest-badge {
+    background: #dff3c9;
+    color: #244d18;
+}
+
+.quest-detail {
+    margin: 0 10px 10px 52px;
+    padding: 10px;
+    border-left: 4px solid #b8caa2;
+    background: rgba(255,255,255,.62);
+    border-radius: 10px;
+}
+
+.quest-detail p {
+    margin: 0 0 8px;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.quest-detail a {
+    display: inline-block;
+    color: var(--grass-dark);
+    font-weight: 900;
+    text-decoration: underline;
+}
+
+.quest-reset {
+    justify-self: stretch;
+    padding: 9px 10px;
+}
+
+.quest-reset:hover {
+    background: #d4c0a1;
+}
+
+@media (max-width: 1000px) {
+    .sidebar.right-panel {
+        display: block;
+    }
+
+    .quest-board {
+        position: static;
+    }
+}
+
+@media (max-width: 520px) {
+    .quest-main {
+        grid-template-columns: 34px minmax(0, 1fr);
+    }
+
+    .quest-badge {
+        grid-column: 2;
+        justify-self: start;
+    }
+
+    .quest-detail {
+        margin-left: 10px;
+    }
+}
+
+/* ===== 按鈕置中修正：避免表單送出按鈕偏右 ===== */
+.form-stack .btn {
+    justify-self: center;
+    width: min(260px, 100%);
+    min-width: 190px;
+    margin-top: 12px;
+}
+
+@media (max-width: 720px) {
     .form-stack .btn {
         justify-self: stretch;
         width: 100%;

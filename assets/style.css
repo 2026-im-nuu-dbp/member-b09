@@ -1,0 +1,965 @@
+/* assets/style.css
+   Minecraft 主題 + Dcard 網頁版資訊流感覺：上方導覽、左右欄、中間貼文卡片。 */
+
+:root {
+    --grass: #5f8f3a;
+    --grass-dark: #31551f;
+    --dirt: #8a5a2b;
+    --stone: #3e4b3f;
+    --paper: #fffdf3;
+    --paper-2: #f4f7e8;
+    --ink: #1d2a18;
+    --muted: #6f7f63;
+    --line: #25351d;
+    --shadow: #1f2b18;
+    --danger: #b03a2e;
+    --success: #2e7d32;
+    --diamond: #3fbdd9;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    color: var(--ink);
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", Arial, sans-serif;
+    background:
+        linear-gradient(45deg, rgba(255,255,255,.03) 25%, transparent 25%) 0 0 / 28px 28px,
+        linear-gradient(-45deg, rgba(255,255,255,.03) 25%, transparent 25%) 0 0 / 28px 28px,
+        linear-gradient(180deg, #86b85d 0 0, #86b85d 90px, #6b8f45 90px 110px, #7b4f28 110px 100%);
+    min-height: 100vh;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.topbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: rgba(32, 55, 25, .96);
+    border-bottom: 4px solid #15230f;
+    color: #f5ffe6;
+    box-shadow: 0 4px 0 rgba(0,0,0,.22);
+}
+
+.topbar-inner {
+    max-width: 1240px;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 12px 18px;
+}
+
+.brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 900;
+    letter-spacing: .5px;
+    white-space: nowrap;
+}
+
+.brand-cube {
+    display: inline-grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(135deg, #78b957 0 50%, #4f7f30 50% 100%);
+    border: 2px solid #c7f59d;
+    box-shadow: 3px 3px 0 #0f1a0b;
+}
+
+.nav-links {
+    display: flex;
+    gap: 8px;
+    flex: 1;
+    flex-wrap: wrap;
+}
+
+.nav-links a,
+.small-link {
+    padding: 8px 10px;
+    border-radius: 8px;
+    color: #e8ffd4;
+}
+
+.nav-links a:hover,
+.nav-links a.active,
+.small-link.primary {
+    background: #4f7f30;
+}
+
+.user-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.layout {
+    max-width: 1240px;
+    margin: 22px auto;
+    padding: 0 18px;
+    display: grid;
+    grid-template-columns: 210px minmax(0, 1fr) 260px;
+    gap: 18px;
+    align-items: start;
+}
+
+.pixel-card {
+    background: rgba(255, 253, 243, .96);
+    border: 3px solid var(--line);
+    border-radius: 14px;
+    box-shadow: 6px 6px 0 var(--shadow);
+    padding: 18px;
+}
+
+.card-title,
+.side-title {
+    font-weight: 900;
+    font-size: 20px;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #b8caa2;
+}
+
+.side-card {
+    position: sticky;
+    top: 82px;
+}
+
+.side-link {
+    display: block;
+    padding: 11px 12px;
+    margin: 8px 0;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    background: #eef5df;
+}
+
+.side-link:hover,
+.side-link.active {
+    border-color: var(--line);
+    background: #d9edbd;
+}
+
+.quest-list {
+    padding-left: 20px;
+    line-height: 1.9;
+}
+
+.feed,
+.thread-wrap,
+.settings-wrap,
+.admin-wrap,
+.mailer-wrap,
+.auth-wrap {
+    min-width: 0;
+}
+
+.auth-wrap,
+.settings-wrap {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: center;
+}
+
+.auth-card {
+    max-width: 520px;
+    width: 100%;
+}
+
+.wide-auth {
+    max-width: 860px;
+}
+
+.composer-card,
+.post-card,
+.search-bar,
+.thread-card,
+.replies-card,
+.reply-form-card,
+.table-card {
+    margin-bottom: 18px;
+}
+
+.composer-user,
+.login-hint,
+.post-meta-row,
+.reply-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.post-card {
+    padding: 0;
+    overflow: hidden;
+}
+
+.post-link {
+    display: block;
+    padding: 18px;
+    border-left: 10px solid var(--user-color, #c8e6a0);
+}
+
+.post-card:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 8px 8px 0 var(--shadow);
+}
+
+.post-card h2,
+.thread-card h1 {
+    margin: 12px 0 8px;
+    line-height: 1.35;
+}
+
+.post-card p,
+.post-body,
+.reply-content {
+    line-height: 1.75;
+    white-space: pre-wrap;
+}
+
+.post-actions {
+    display: flex;
+    gap: 14px;
+    color: var(--muted);
+    font-size: 14px;
+    margin-top: 12px;
+}
+
+.search-bar {
+    display: flex;
+    gap: 10px;
+}
+
+.search-bar input {
+    flex: 1;
+}
+
+.form-stack {
+    display: grid;
+    gap: 14px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+label {
+    display: grid;
+    gap: 7px;
+    font-weight: 800;
+}
+
+input,
+textarea,
+select {
+    width: 100%;
+    border: 3px solid #26361f;
+    border-radius: 10px;
+    padding: 11px 12px;
+    background: #fffef8;
+    color: var(--ink);
+    font: inherit;
+    outline: none;
+}
+
+textarea {
+    resize: vertical;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: var(--diamond);
+    box-shadow: 0 0 0 3px rgba(63, 189, 217, .22);
+}
+
+small,
+.muted {
+    color: var(--muted);
+    font-size: 13px;
+    margin: 0;
+    font-weight: 500;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid #14210f;
+    border-radius: 10px;
+    padding: 11px 16px;
+    background: linear-gradient(#73aa4a, #477c2c);
+    color: #fffbe6;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 4px 4px 0 #1c2c15;
+}
+
+.btn:hover {
+    filter: brightness(1.05);
+    transform: translate(-1px, -1px);
+}
+
+.btn.secondary {
+    background: linear-gradient(#d4c0a1, #9b7144);
+}
+
+.btn.small {
+    padding: 8px 11px;
+    margin-right: 8px;
+}
+
+.button-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.alert {
+    border: 3px solid var(--line);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+    font-weight: 800;
+}
+
+.alert.success {
+    background: #dff3c9;
+    color: #244d18;
+}
+
+.alert.error {
+    background: #ffe1dc;
+    color: #7f1f16;
+}
+
+.big-avatar,
+.mini-avatar,
+.avatar-preview {
+    display: inline-grid;
+    place-items: center;
+    border: 3px solid #26361f;
+    background: #d8efbd;
+    box-shadow: 3px 3px 0 #1c2c15;
+    flex: 0 0 auto;
+}
+
+.big-avatar {
+    width: 54px;
+    height: 54px;
+    border-radius: 14px;
+    font-size: 24px;
+}
+
+.mini-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    font-size: 16px;
+}
+
+.avatar-preview {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    font-size: 20px;
+}
+
+.nickname {
+    font-weight: 900;
+}
+
+.dot,
+.reply-time,
+.floor {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.thread-wrap,
+.admin-wrap,
+.mailer-wrap {
+    grid-column: 1 / -1;
+    max-width: 980px;
+    width: 100%;
+    margin: auto;
+}
+
+.back-link {
+    display: inline-block;
+    margin-bottom: 16px;
+    font-weight: 900;
+    color: #fffbe6;
+    text-shadow: 2px 2px #15230f;
+}
+
+.thread-card {
+    border-left: 12px solid var(--user-color, #c8e6a0);
+}
+
+.reply-block {
+    border: 3px solid #26361f;
+    border-radius: 14px;
+    padding: 14px;
+    margin: 12px 0;
+    box-shadow: 4px 4px 0 rgba(29, 42, 24, .6);
+}
+
+.reply-content {
+    margin-top: 10px;
+    background: rgba(255,255,255,.55);
+    border-radius: 10px;
+    padding: 12px;
+}
+
+.choice-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+}
+
+.choice-card {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f0f7e5;
+    border: 3px solid #26361f;
+    border-radius: 12px;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.choice-card input {
+    width: auto;
+}
+
+.color-dot {
+    width: 26px;
+    height: 26px;
+    border: 2px solid #26361f;
+    border-radius: 8px;
+}
+
+.checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #eef5df;
+    border: 2px solid #c5d7aa;
+    padding: 12px;
+    border-radius: 10px;
+}
+
+.checkbox-row input {
+    width: auto;
+}
+
+.table-wrap {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fffef8;
+}
+
+th,
+td {
+    padding: 12px;
+    border-bottom: 2px solid #d3dfc1;
+    text-align: left;
+    vertical-align: middle;
+}
+
+th {
+    background: #d9edbd;
+    color: #223718;
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border: 2px solid #26361f;
+    border-radius: 999px;
+    background: #edf4de;
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.badge.sent,
+.badge.active {
+    background: #dff3c9;
+}
+
+.badge.failed,
+.badge.locked {
+    background: #ffd8d2;
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.actions form {
+    display: inline;
+}
+
+.link-danger {
+    border: 0;
+    background: transparent;
+    color: var(--danger);
+    font: inherit;
+    cursor: pointer;
+    font-weight: 900;
+    padding: 0;
+}
+
+.footer-link {
+    text-align: center;
+}
+
+.footer-link a {
+    font-weight: 900;
+    color: var(--grass-dark);
+}
+
+.empty-card {
+    text-align: center;
+    padding: 30px;
+    color: var(--muted);
+}
+
+.footer {
+    text-align: center;
+    color: #f5ffe6;
+    padding: 30px;
+    text-shadow: 2px 2px #15230f;
+}
+
+@media (max-width: 1000px) {
+    .layout {
+        grid-template-columns: 1fr;
+    }
+    .sidebar {
+        display: none;
+    }
+    .thread-wrap,
+    .admin-wrap,
+    .mailer-wrap,
+    .auth-wrap,
+    .settings-wrap {
+        grid-column: auto;
+    }
+}
+
+@media (max-width: 720px) {
+    .topbar-inner {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+    .form-grid,
+    .choice-grid {
+        grid-template-columns: 1fr;
+    }
+    .search-bar {
+        flex-direction: column;
+    }
+}
+
+/* ===== 表單欄位對齊修正版：註冊 / 個人資料頁 ===== */
+/* 放在檔案最下方，用後寫覆蓋前寫的方式修正原本選項卡高度與文字溢位問題。 */
+
+.auth-card.wide-auth,
+.wide-auth {
+    max-width: 960px;
+    width: 100%;
+}
+
+.form-stack {
+    display: grid;
+    gap: 18px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px 22px;
+    align-items: start;
+}
+
+.form-grid > label {
+    display: grid;
+    grid-template-rows: auto 48px 18px;
+    gap: 8px;
+    min-height: 94px;
+}
+
+.form-grid input,
+.form-grid select,
+.form-grid textarea {
+    height: 48px;
+    line-height: 1.4;
+}
+
+.form-grid small {
+    min-height: 18px;
+    display: block;
+}
+
+.section-label {
+    font-weight: 900;
+    color: var(--ink);
+    margin-top: 4px;
+    margin-bottom: -4px;
+}
+
+.choice-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 12px;
+    align-items: stretch;
+}
+
+.choice-card {
+    display: grid;
+    grid-template-columns: 24px minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    min-height: 64px;
+    width: 100%;
+    padding: 12px;
+    line-height: 1.35;
+}
+
+.choice-card input[type="radio"],
+.choice-card input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    justify-self: center;
+}
+
+.choice-card span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    word-break: keep-all;
+}
+
+.color-grid .choice-card {
+    grid-template-columns: 24px 34px minmax(0, 1fr);
+}
+
+.color-dot {
+    width: 28px;
+    height: 28px;
+    border: 2px solid #26361f;
+    border-radius: 8px;
+    flex: none;
+}
+
+.avatar-grid .choice-card {
+    grid-template-columns: 24px 50px minmax(0, 1fr);
+    min-height: 74px;
+}
+
+.avatar-preview {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    font-size: 20px;
+    flex: none;
+}
+
+.form-stack .btn {
+    justify-self: end;
+    min-width: 150px;
+}
+
+@media (max-width: 720px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-grid > label {
+        grid-template-rows: auto 48px auto;
+        min-height: auto;
+    }
+
+    .choice-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-stack .btn {
+        justify-self: stretch;
+        width: 100%;
+    }
+}
+/* ===== 互動版系統任務板 ===== */
+.quest-board {
+    display: grid;
+    gap: 14px;
+}
+
+.quest-board .compact-title {
+    margin-bottom: 6px;
+    padding-bottom: 8px;
+}
+
+.quest-board-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.quest-level {
+    display: inline-grid;
+    place-items: center;
+    min-width: 56px;
+    height: 34px;
+    padding: 0 10px;
+    border: 3px solid #26361f;
+    border-radius: 10px;
+    background: #d9edbd;
+    box-shadow: 3px 3px 0 #1c2c15;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.quest-progress-wrap {
+    display: grid;
+    gap: 8px;
+}
+
+.quest-progress-text {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 900;
+}
+
+.quest-progress-track {
+    height: 18px;
+    border: 3px solid #26361f;
+    border-radius: 999px;
+    background: #fffef8;
+    overflow: hidden;
+    box-shadow: inset 2px 2px 0 rgba(0,0,0,.18);
+}
+
+.quest-progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #5f8f3a, #3fbdd9);
+    transition: width .25s ease;
+}
+
+.quest-filter {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.quest-filter-btn,
+.quest-reset,
+.quest-check,
+.quest-open {
+    font: inherit;
+}
+
+.quest-filter-btn,
+.quest-reset {
+    border: 2px solid #26361f;
+    border-radius: 9px;
+    background: #eef5df;
+    color: var(--ink);
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.quest-filter-btn {
+    padding: 7px 6px;
+    font-size: 13px;
+}
+
+.quest-filter-btn.active,
+.quest-filter-btn:hover {
+    background: #d9edbd;
+    box-shadow: 2px 2px 0 #1c2c15;
+}
+
+.quest-items {
+    display: grid;
+    gap: 10px;
+}
+
+.quest-item {
+    border: 3px solid #26361f;
+    border-radius: 12px;
+    background: #f0f7e5;
+    overflow: hidden;
+    box-shadow: 3px 3px 0 rgba(29, 42, 24, .55);
+}
+
+.quest-item.is-open {
+    background: #fffef8;
+}
+
+.quest-item.is-done {
+    border-color: var(--grass-dark);
+}
+
+.quest-main {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr) auto;
+    gap: 8px;
+    align-items: center;
+    padding: 10px;
+}
+
+.quest-check {
+    width: 32px;
+    height: 32px;
+    border: 3px solid #26361f;
+    border-radius: 9px;
+    background: #fffef8;
+    color: var(--danger);
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 2px 2px 0 #1c2c15;
+}
+
+.quest-item.is-done .quest-check {
+    background: #dff3c9;
+    color: var(--success);
+}
+
+.quest-open {
+    display: grid;
+    gap: 3px;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    text-align: left;
+    cursor: pointer;
+}
+
+.quest-open:hover .quest-name {
+    text-decoration: underline;
+}
+
+.quest-name {
+    font-weight: 900;
+    overflow-wrap: anywhere;
+}
+
+.quest-reward {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.quest-badge {
+    padding: 4px 7px;
+    border: 2px solid #26361f;
+    border-radius: 999px;
+    background: #ffd8d2;
+    color: #7f1f16;
+    font-size: 12px;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.quest-item.is-done .quest-badge {
+    background: #dff3c9;
+    color: #244d18;
+}
+
+.quest-detail {
+    margin: 0 10px 10px 52px;
+    padding: 10px;
+    border-left: 4px solid #b8caa2;
+    background: rgba(255,255,255,.62);
+    border-radius: 10px;
+}
+
+.quest-detail p {
+    margin: 0 0 8px;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.quest-detail a {
+    display: inline-block;
+    color: var(--grass-dark);
+    font-weight: 900;
+    text-decoration: underline;
+}
+
+.quest-reset {
+    justify-self: stretch;
+    padding: 9px 10px;
+}
+
+.quest-reset:hover {
+    background: #d4c0a1;
+}
+
+@media (max-width: 1000px) {
+    .sidebar.right-panel {
+        display: block;
+    }
+
+    .quest-board {
+        position: static;
+    }
+}
+
+@media (max-width: 520px) {
+    .quest-main {
+        grid-template-columns: 34px minmax(0, 1fr);
+    }
+
+    .quest-badge {
+        grid-column: 2;
+        justify-self: start;
+    }
+
+    .quest-detail {
+        margin-left: 10px;
+    }
+}
+
+/* ===== 按鈕置中修正：避免表單送出按鈕偏右 ===== */
+.form-stack .btn {
+    justify-self: center;
+    width: min(260px, 100%);
+    min-width: 190px;
+    margin-top: 12px;
+}
+
+@media (max-width: 720px) {
+    .form-stack .btn {
+        justify-self: stretch;
+        width: 100%;
+    }
+}
